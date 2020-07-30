@@ -42,6 +42,7 @@
 <li><a href="#_splitting_dev_and_production_configuration">Splitting Dev and Production configuration</a></li>
 <li><a href="#_using_dev_server">Using Dev-server</a></li>
 <li><a href="#_html_loader_file_loader_and_clean_webpack">HTML loader, File loader and Clean-Webpack</a></li>
+<li><a href="#_vendor_js_and_mutiple_entrypoint">Vendor.js and Mutiple Entrypoint</a></li>
 </ul>
 </div>
 </div>
@@ -678,12 +679,186 @@ module.exports = merge(common, {
 <div class="paragraph">
 <p><a href="https://webpack.js.org/loaders/html-loader/" target="_blank" rel="noopener">HTML Loader</a></p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm install --save-dev html-loader</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://webpack.js.org/loaders/file-loader/" target="_blank" rel="noopener">File Loader</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm install file-loader --save-dev</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/johnagan/clean-webpack-plugin" target="_blank" rel="noopener">Clean Webpack Plugin</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm install --save-dev clean-webpack-plugin</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.prod.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin()],
+});</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_vendor_js_and_mutiple_entrypoint">Vendor.js and Mutiple Entrypoint</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, using the current configuration, all the javascript is being combined into main.js. We may want to separate <strong>vendor</strong> specific javascript file to a separate file. We can do this by creating a separate <strong>vendor.js</strong> file and then importing third-party libraries into it. We will also have to modify the webconfig, here we will modify the webconfig.common.js) to add two separate entry points. We will also need to modify the production and dev configuartion as there are two separate js files being generated.</p>
+</div>
+<div class="paragraph">
+<p><strong>vendor.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">import 'bootstrap'; # <b class="conum">(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Here we have added bootstrap as a vendor javascript library</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>webpack.common.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: {
+    main: './src/index.js',     # <b class="conum">(1)</b>
+    vendor: './src/vendor.js',  # <b class="conum">(2)</b>
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }, {
+      test: /\.html$/i,
+      loader: 'html-loader',
+    }, {
+      test: /\.(svg|png|jpe?g|gif)$/i,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash].[ext]',
+          outputPath: 'assets',
+        },
+      },
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>The default index.js will generate main.js</p>
+</li>
+<li>
+<p>bootstrap and other vendor related javascript will be added the vendor.js</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>webpack.dev.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  output: {
+    filename: '[name].bundle.js',   # <b class="conum">(1)</b>
+    path: path.resolve(__dirname, 'dist'),
+  },
+});</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>The change here is the <em>name</em> is taken from the <em>key</em> value present in entry parameter</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>webpack.prod.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: '[name].[contentHash].bundle.js', # <b class="conum">(1)</b>
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin()],
+});</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>The <em>name</em> is taken from the entry key</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-30 17:01:49 -0400
+Last updated 2020-07-30 19:22:21 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

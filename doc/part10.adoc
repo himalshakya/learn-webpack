@@ -1,0 +1,90 @@
+== Vendor.js and Mutiple Entrypoint
+
+By default, using the current configuration, all the javascript is being combined into main.js. We may want to separate *vendor* specific javascript file to a separate file. We can do this by creating a separate *vendor.js* file and then importing third-party libraries into it. We will also have to modify the webconfig, here we will modify the webconfig.common.js) to add two separate entry points. We will also need to modify the production and dev configuartion as there are two separate js files being generated.
+
+*vendor.js*
+[source, javascript]
+----
+import 'bootstrap'; # <1>
+----
+<1> Here we have added bootstrap as a vendor javascript library
+
+*webpack.common.js*
+[source, javascript]
+----
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: {
+    main: './src/index.js',     # <1>
+    vendor: './src/vendor.js',  # <2>
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }, {
+      test: /\.html$/i,
+      loader: 'html-loader',
+    }, {
+      test: /\.(svg|png|jpe?g|gif)$/i,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash].[ext]',
+          outputPath: 'assets',
+        },
+      },
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};
+----
+<1> The default index.js will generate main.js
+<2> bootstrap and other vendor related javascript will be added the vendor.js
+
+*webpack.dev.js*
+[source, javascript]
+----
+const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  output: {
+    filename: '[name].bundle.js',   # <1>
+    path: path.resolve(__dirname, 'dist'),
+  },
+});
+----
+<1> The change here is the _name_ is taken from the _key_ value present in entry parameter
+
+*webpack.prod.js*
+[source, javascript]
+----
+const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: '[name].[contentHash].bundle.js', # <1>
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin()],
+});
+----
+<1> The _name_ is taken from the entry key
