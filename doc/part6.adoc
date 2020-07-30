@@ -1,0 +1,61 @@
+== Cache Busting and Plugins
+
+To allow caching, we can add hash to the filename, so the unchanged file caches are used for performance.
+
+[source, javascript]
+----
+const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+};
+----
+
+The filename will be changed according to the Hash, also this means that we cannot use a static link to the javascript file. We can use a plugin to fix this problem.
+
+=== Plugins
+
+* https://webpack.js.org/plugins/[Plugins,window=_blank]
+* https://webpack.js.org/configuration/plugins/[Plugins Configuration,window=_blank]
+
+[source, bash]
+----
+npm install --save-dev html-webpack-plugin
+----
+
+[source, javascript]
+----
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};
+----
+
+To use the HtmlWebpackPlugin, we need to use a template page.

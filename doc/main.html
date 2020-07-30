@@ -34,6 +34,11 @@
 <li><a href="#_configuring_webpack">Configuring Webpack</a></li>
 <li><a href="#_loaders_css_and_sass">Loaders, CSS and SASS</a></li>
 <li><a href="#_adding_bootstrap_and_scss">Adding Bootstrap and SCSS</a></li>
+<li><a href="#_cache_busting_and_plugins">Cache Busting and Plugins</a>
+<ul class="sectlevel2">
+<li><a href="#_plugins_2">Plugins</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -453,10 +458,54 @@ run(new AlertService(), new ComponentService());</code></pre>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_cache_busting_and_plugins">Cache Busting and Plugins</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To allow caching, we can add hash to the filename, so the unchanged file caches are used for performance.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The filename will be changed according to the Hash, also this means that we cannot use a static link to the javascript file. We can use a plugin to fix this problem.</p>
+</div>
+<div class="sect2">
+<h3 id="_plugins_2">Plugins</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://webpack.js.org/plugins/" target="_blank" rel="noopener">Plugins</a></p>
+</li>
+<li>
+<p><a href="https://webpack.js.org/configuration/plugins/" target="_blank" rel="noopener">Plugins Configuration</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-30 00:50:14 -0400
+Last updated 2020-07-30 10:48:29 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
