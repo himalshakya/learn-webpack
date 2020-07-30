@@ -1,0 +1,12 @@
+
+== Installing and Running Webpack and Webpack-Cli
+
+[source,bash]
+----
+git init
+npm init -y
+npm i -D webpack webpack-cli
+npm i -D asciidoctor
+npm i -D @asciidoctor/core asciidoctor-pdf
+npm install eslint --save-dev
+----

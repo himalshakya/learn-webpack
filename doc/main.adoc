@@ -1,0 +1,13 @@
+= Learning Javascript Technologies
+:source-highlighter: highlightjs
+Himal Shakya
+:toc: left
+
+This is a write-up about javascript technologies, that I am learning and have recently encountered...
+
+image::javascript-js.svg[Javascript,300,200]
+
+---
+
+include::webpack.adoc[]
+include::part2.adoc[]
