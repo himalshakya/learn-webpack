@@ -31,6 +31,7 @@
 </ul>
 </li>
 <li><a href="#_installing_and_running_webpack_and_webpack_cli">Installing and Running Webpack and Webpack-Cli</a></li>
+<li><a href="#_configuring_webpack">Configuring Webpack</a></li>
 </ul>
 </div>
 </div>
@@ -271,10 +272,59 @@ npm install eslint --save-dev</code></pre>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_configuring_webpack">Configuring Webpack</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>webpack.config.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');   # <b class="conum">(1)</b>
+
+module.exports = {
+  mode: 'development',  # <b class="conum">(2)</b>
+  entry: './src/index.js',    # <b class="conum">(3)</b>
+  output: {
+    filename: 'main.js',      # <b class="conum">(4)</b>
+    path: path.resolve(__dirname, 'build')  #<b class="conum">(5)</b>
+  }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Importing path, used in path.resolve</p>
+</li>
+<li>
+<p>mode, here set to <strong>development</strong>, by default is <strong>production</strong></p>
+</li>
+<li>
+<p>entry point of the web application used by Webpack</p>
+</li>
+<li>
+<p>output filename (default is main.js)</p>
+</li>
+<li>
+<p>output folder location (default is dist)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>You can also point to a specific config file by running the command or adding it to the package.json</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">webpack --config webpack.config.js</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-28 23:58:56 -0400
+Last updated 2020-07-29 22:26:29 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

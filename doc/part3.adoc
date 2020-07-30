@@ -1,0 +1,28 @@
+== Configuring Webpack
+
+*webpack.config.js*
+[source,javascript]
+----
+const path = require('path');   # <1>
+
+module.exports = {
+  mode: 'development',  # <2>
+  entry: './src/index.js',    # <3>
+  output: {
+    filename: 'main.js',      # <4>
+    path: path.resolve(__dirname, 'build')  #<5>
+  }
+}
+----
+<1> Importing path, used in path.resolve
+<2> mode, here set to *development*, by default is *production*
+<3> entry point of the web application used by Webpack
+<4> output filename (default is main.js)
+<5> output folder location (default is dist)
+
+You can also point to a specific config file by running the command or adding it to the package.json
+
+[source,bash]
+----
+webpack --config webpack.config.js
+----

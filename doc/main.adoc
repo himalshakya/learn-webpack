@@ -11,3 +11,4 @@ image::javascript-js.svg[Javascript,300,200]
 
 include::webpack.adoc[]
 include::part2.adoc[]
+include::part3.adoc[]
