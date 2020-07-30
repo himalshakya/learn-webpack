@@ -39,6 +39,9 @@
 <li><a href="#_plugins_2">Plugins</a></li>
 </ul>
 </li>
+<li><a href="#_splitting_dev_and_production_configuration">Splitting Dev and Production configuration</a></li>
+<li><a href="#_using_dev_server">Using Dev-server</a></li>
+<li><a href="#_html_loader_file_loader_and_clean_webpack">HTML loader, File loader and Clean-Webpack</a></li>
 </ul>
 </div>
 </div>
@@ -499,13 +502,188 @@ module.exports = {
 </li>
 </ul>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm install --save-dev html-webpack-plugin</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To use the HtmlWebpackPlugin, we need to use a template page.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_splitting_dev_and_production_configuration">Splitting Dev and Production configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create two separate configuration and inherit from a common configuration, we will use the webpack-merge plugin to merge configuration in common to both production and development.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm i -D webpack-merge</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add parts that are common to both configurations to webconfig.common.js</p>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.common.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/index.js',
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.dev.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'development',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.prod.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {
+  merge
+} = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+});</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_dev_server">Using Dev-server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will be installing a dev-server, so that any changes to the files are directly reflected in the browser, without us refreshing the browser.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm i -D webpack-dev-server</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>we then change the package.json file so that it will point to the dev-server, instead of using the webpack command.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="json" class="language-json hljs">{
+    "name": "learn-js",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "webpack-dev-server --config webpack.dev.js --open",
+        "build": "webpack --config webpack.prod.js",
+        "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",
+        "createdoc": "node ./scripts/convert-asciidoc.mjs"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@asciidoctor/core": "^2.2.0",
+        "asciidoctor-pdf": "^1.0.0-alpha.8",
+        "bootstrap": "^4.5.0",
+        "css-loader": "^4.1.0",
+        "eslint": "^7.5.0",
+        "eslint-config-airbnb-base": "^14.2.0",
+        "eslint-plugin-import": "^2.22.0",
+        "highlight.js": "^10.1.2",
+        "html-webpack-plugin": "^4.3.0",
+        "sass": "^1.26.10",
+        "sass-loader": "^9.0.2",
+        "style-loader": "^1.2.1",
+        "webpack": "^4.44.0",
+        "webpack-cli": "^3.3.12",
+        "webpack-dev-server": "^3.11.0",
+        "webpack-merge": "^5.0.9"
+    },
+    "dependencies": {
+        "asciidoctor": "^2.2.0"
+    }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_html_loader_file_loader_and_clean_webpack">HTML loader, File loader and Clean-Webpack</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://webpack.js.org/loaders/html-loader/" target="_blank" rel="noopener">HTML Loader</a></p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-30 10:48:29 -0400
+Last updated 2020-07-30 17:01:49 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

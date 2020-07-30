@@ -1,0 +1,50 @@
+== Using Dev-server
+
+We will be installing a dev-server, so that any changes to the files are directly reflected in the browser, without us refreshing the browser.
+
+[source, bash]
+----
+npm i -D webpack-dev-server
+----
+
+we then change the package.json file so that it will point to the dev-server, instead of using the webpack command.
+
+[source, json]
+----
+{
+    "name": "learn-js",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "webpack-dev-server --config webpack.dev.js --open",
+        "build": "webpack --config webpack.prod.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "createdoc": "node ./scripts/convert-asciidoc.mjs"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@asciidoctor/core": "^2.2.0",
+        "asciidoctor-pdf": "^1.0.0-alpha.8",
+        "bootstrap": "^4.5.0",
+        "css-loader": "^4.1.0",
+        "eslint": "^7.5.0",
+        "eslint-config-airbnb-base": "^14.2.0",
+        "eslint-plugin-import": "^2.22.0",
+        "highlight.js": "^10.1.2",
+        "html-webpack-plugin": "^4.3.0",
+        "sass": "^1.26.10",
+        "sass-loader": "^9.0.2",
+        "style-loader": "^1.2.1",
+        "webpack": "^4.44.0",
+        "webpack-cli": "^3.3.12",
+        "webpack-dev-server": "^3.11.0",
+        "webpack-merge": "^5.0.9"
+    },
+    "dependencies": {
+        "asciidoctor": "^2.2.0"
+    }
+}
+----

@@ -1,0 +1,69 @@
+
+== Splitting Dev and Production configuration
+
+Create two separate configuration and inherit from a common configuration, we will use the webpack-merge plugin to merge configuration in common to both production and development.
+
+[source, bash]
+----
+npm i -D webpack-merge
+----
+
+Add parts that are common to both configurations to webconfig.common.js
+
+*webconfig.common.js*
+[source, javascript]
+----
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: './src/index.js',
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};
+----
+
+*webconfig.dev.js*
+[source, javascript]
+----
+const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'development',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+});
+----
+
+*webconfig.prod.js*
+[source, javascript]
+----
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {
+  merge
+} = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+});
+----
+

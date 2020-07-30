@@ -1,0 +1,45 @@
+== HTML loader, File loader and Clean-Webpack
+
+https://webpack.js.org/loaders/html-loader/[HTML Loader, window=_blank]
+
+[source, bash]
+----
+npm install --save-dev html-loader
+----
+
+https://webpack.js.org/loaders/file-loader/[File Loader, window=_blank]
+
+[source, bash]
+----
+npm install file-loader --save-dev
+----
+
+https://github.com/johnagan/clean-webpack-plugin[Clean Webpack Plugin, window=_blank]
+
+[source, bash]
+----
+npm install --save-dev clean-webpack-plugin
+----
+
+*webconfig.prod.js*
+[source, javascript]
+----
+const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: 'main.[contentHash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin()],
+});
+----
+
