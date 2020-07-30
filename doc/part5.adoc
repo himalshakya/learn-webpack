@@ -1,0 +1,53 @@
+== Adding Bootstrap and SCSS
+
+To install boostrap and sass
+
+[source,bash]
+----
+npm i -D bootstrap
+npm i -D sass-loader sass
+----
+
+We now need to modify the config file
+
+[source,javascript]
+----
+const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+};
+----
+
+We also need to add main.scss to the index.js
+
+*index.js*
+[source,javascript]
+----
+import run from './app/app';
+import AlertService from './app/alert.service';
+import ComponentService from './app/component.service';
+import './main.scss';
+
+run(new AlertService(), new ComponentService());
+----
+
+We can change the default primary color, first by adding bootstrap to main.scss and also changing the primary color attribute.
+
+*main.scss*
+[source,scss]
+----
+$primary: teal;
+@import "~bootstrap/scss/bootstrap";
+----

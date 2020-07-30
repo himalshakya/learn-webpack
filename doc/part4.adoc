@@ -1,0 +1,49 @@
+== Loaders, CSS and SASS
+
+*https://webpack.js.org/concepts/loaders/[Loaders,window=_blank]*
+
+Loaders are transformations that are applied to the source code of a module. They allow you to pre-process files as you import or “load” them. Thus, loaders are kind of like “tasks” in other build tools and provide a powerful way to handle front-end build steps. Loaders can transform files from a different language (like TypeScript) to JavaScript or load inline images as data URLs. Loaders even allow you to do things like import CSS files directly from your JavaScript modules!
+
+https://webpack.js.org/loaders/[List of Loaders,window=_blank]
+
+To add css loader and style loader
+
+[source,bash]
+----
+npm i -D style-loader css-loader
+----
+
+we also need to edit the config file
+
+[source,javascript]
+----
+const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.css$/i,
+      use: ['style-loader', 'css-loader'], # <1>
+    }],
+  },
+};
+----
+<1> The order is reversed 'css-loader' is loaded first then 'style-loader'
+
+We also need to add main.css to the index.js
+
+[source,javascript]
+----
+import run from './app/app';
+import AlertService from './app/alert.service';
+import ComponentService from './app/component.service';
+import './main.css';
+
+run(new AlertService(), new ComponentService());
+----

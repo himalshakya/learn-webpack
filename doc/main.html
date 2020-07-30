@@ -32,6 +32,8 @@
 </li>
 <li><a href="#_installing_and_running_webpack_and_webpack_cli">Installing and Running Webpack and Webpack-Cli</a></li>
 <li><a href="#_configuring_webpack">Configuring Webpack</a></li>
+<li><a href="#_loaders_css_and_sass">Loaders, CSS and SASS</a></li>
+<li><a href="#_adding_bootstrap_and_scss">Adding Bootstrap and SCSS</a></li>
 </ul>
 </div>
 </div>
@@ -321,10 +323,140 @@ module.exports = {
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_loaders_css_and_sass">Loaders, CSS and SASS</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong><a href="https://webpack.js.org/concepts/loaders/" target="_blank" rel="noopener">Loaders</a></strong></p>
+</div>
+<div class="paragraph">
+<p>Loaders are transformations that are applied to the source code of a module. They allow you to pre-process files as you import or “load” them. Thus, loaders are kind of like “tasks” in other build tools and provide a powerful way to handle front-end build steps. Loaders can transform files from a different language (like TypeScript) to JavaScript or load inline images as data URLs. Loaders even allow you to do things like import CSS files directly from your JavaScript modules!</p>
+</div>
+<div class="paragraph">
+<p><a href="https://webpack.js.org/loaders/" target="_blank" rel="noopener">List of Loaders</a></p>
+</div>
+<div class="paragraph">
+<p>To add css loader and style loader</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm i -D style-loader css-loader</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>we also need to edit the config file</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.css$/i,
+      use: ['style-loader', 'css-loader'], # <b class="conum">(1)</b>
+    }],
+  },
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>The order is reversed 'css-loader' is loaded first then 'style-loader'</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>We also need to add main.css to the index.js</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">import run from './app/app';
+import AlertService from './app/alert.service';
+import ComponentService from './app/component.service';
+import './main.css';
+
+run(new AlertService(), new ComponentService());</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adding_bootstrap_and_scss">Adding Bootstrap and SCSS</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To install boostrap and sass</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm i -D bootstrap
+npm i -D sass-loader sass</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We now need to modify the config file</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+
+module.exports = {
+  mode: 'development',
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We also need to add main.scss to the index.js</p>
+</div>
+<div class="paragraph">
+<p><strong>index.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">import run from './app/app';
+import AlertService from './app/alert.service';
+import ComponentService from './app/component.service';
+import './main.scss';
+
+run(new AlertService(), new ComponentService());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can change the default primary color, first by adding bootstrap to main.scss and also changing the primary color attribute.</p>
+</div>
+<div class="paragraph">
+<p><strong>main.scss</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="scss" class="language-scss hljs">$primary: teal;
+@import "~bootstrap/scss/bootstrap";</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-29 22:26:29 -0400
+Last updated 2020-07-30 00:50:14 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
