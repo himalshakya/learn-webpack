@@ -1,4 +1,4 @@
-== Extract CSS and Minify HTML/CSS/JS
+== Extract CSS
 
 Currently CSS is being loaded by javascript, we want the CSS to load before javascript in production.
 
@@ -72,3 +72,4 @@ module.exports = merge(common, {
   },
 });
 ----
+

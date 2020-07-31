@@ -9,6 +9,11 @@ image::javascript-js.svg[Javascript,300,200]
 
 ---
 
+Resources Used::
+* https://www.youtube.com/watch?v=3On5Z0gjf4U&list=PLblA84xge2_zwxh3XJqy6UVxS60YdusY8&index=1[Learn Webpack - Colt Steele,window=_blank]
+
+---
+
 include::webpack.adoc[]
 include::part02.adoc[]
 include::part03.adoc[]
@@ -20,3 +25,4 @@ include::part08.adoc[]
 include::part09.adoc[]
 include::part10.adoc[]
 include::part11.adoc[]
+include::part12.adoc[]

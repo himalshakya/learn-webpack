@@ -1,0 +1,110 @@
+== Minify HTML/CSS/JS
+
+https://github.com/NMFR/optimize-css-assets-webpack-plugin[Optimize CSS Assets Webpack Plugin,window=_blank]
+
+[source,bash]
+----
+npm install --save-dev optimize-css-assets-webpack-plugin
+----
+
+The HtmlWebpackPlugin has been moved to development configuration, keeping it same, while for the production configuration we have
+added optimize CSS plugin and added extra parameters to the HtmlWebpackPlugin so that it minimizes the HTML content.
+
+*webconfig.common.js*
+[source, javascript]
+----
+module.exports = {
+  entry: {
+    main: './src/index.js',
+    vendor: './src/vendor.js',
+  },
+  module: {
+    rules: [{
+      test: /\.html$/i,
+      loader: 'html-loader',
+    }, {
+      test: /\.(svg|png|jpe?g|gif)$/i,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash].[ext]',
+          outputPath: 'assets',
+        },
+      },
+    }],
+  },
+};
+----
+
+*webconfig.development.js*
+[source, javascript]
+----
+const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+});
+----
+
+*webconfig.prod.js*
+[source, javascript]
+----
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: '[name].[contentHash].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  optimization: {
+    minimizer: [
+      new OptimizeCssAssetsPlugin(), new TerserPlugin(),
+    ],
+  },
+  plugins: [new CleanWebpackPlugin(), new MiniCssExtractPlugin(), new HtmlWebpackPlugin({
+    template: './src/template.html',
+    minify: {
+      removeComments: true,
+      removeAttributeQuotes: true,
+      collapseWhitespace: true,
+    },
+  })],
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+    }],
+  },
+});
+----

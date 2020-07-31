@@ -43,7 +43,8 @@
 <li><a href="#_using_dev_server">Using Dev-server</a></li>
 <li><a href="#_html_loader_file_loader_and_clean_webpack">HTML loader, File loader and Clean-Webpack</a></li>
 <li><a href="#_vendor_js_and_mutiple_entrypoint">Vendor.js and Mutiple Entrypoint</a></li>
-<li><a href="#_extract_css_and_minify_htmlcssjs">Extract CSS and Minify HTML/CSS/JS</a></li>
+<li><a href="#_extract_css">Extract CSS</a></li>
+<li><a href="#_minify_htmlcssjs">Minify HTML/CSS/JS</a></li>
 </ul>
 </div>
 </div>
@@ -57,6 +58,21 @@
 <div class="content">
 <img src="javascript-js.svg" alt="Javascript" width="300" height="200">
 </div>
+</div>
+<hr>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Resources Used</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.youtube.com/watch?v=3On5Z0gjf4U&amp;list=PLblA84xge2_zwxh3XJqy6UVxS60YdusY8&amp;index=1" target="_blank" rel="noopener">Learn Webpack - Colt Steele</a></p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
 </div>
 <hr>
 </div>
@@ -857,7 +873,7 @@ module.exports = merge(common, {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_extract_css_and_minify_htmlcssjs">Extract CSS and Minify HTML/CSS/JS</h2>
+<h2 id="_extract_css">Extract CSS</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Currently CSS is being loaded by javascript, we want the CSS to load before javascript in production.</p>
@@ -870,12 +886,204 @@ module.exports = merge(common, {
 <pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm install --save-dev mini-css-extract-plugin</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>We then need to remove the rules for SCSS, we will add the rule that was present in common to development configuration</p>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.common.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: {
+    main: './src/index.js',
+    vendor: './src/vendor.js',
+  },
+  module: {
+    rules: [{
+      test: /\.html$/i,
+      loader: 'html-loader',
+    }, {
+      test: /\.(svg|png|jpe?g|gif)$/i,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash].[ext]',
+          outputPath: 'assets',
+        },
+      },
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We also need to modify the production configuration to add the rules to extract CSS</p>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.prod.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: '[name].[contentHash].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin(), new MiniCssExtractPlugin()],
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+    }],
+  },
+});</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_minify_htmlcssjs">Minify HTML/CSS/JS</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://github.com/NMFR/optimize-css-assets-webpack-plugin" target="_blank" rel="noopener">Optimize CSS Assets Webpack Plugin</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm install --save-dev optimize-css-assets-webpack-plugin</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The HtmlWebpackPlugin has been moved to development configuration, keeping it same, while for the production configuration we have
+added optimize CSS plugin and added extra parameters to the HtmlWebpackPlugin so that it minimizes the HTML content.</p>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.common.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">module.exports = {
+  entry: {
+    main: './src/index.js',
+    vendor: './src/vendor.js',
+  },
+  module: {
+    rules: [{
+      test: /\.html$/i,
+      loader: 'html-loader',
+    }, {
+      test: /\.(svg|png|jpe?g|gif)$/i,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash].[ext]',
+          outputPath: 'assets',
+        },
+      },
+    }],
+  },
+};</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.development.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const {
+  merge
+} = require('webpack-merge');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: ['style-loader', 'css-loader', 'sass-loader'],
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>webconfig.prod.js</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="javascript" class="language-javascript hljs">const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: '[name].[contentHash].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  optimization: {
+    minimizer: [
+      new OptimizeCssAssetsPlugin(), new TerserPlugin(),
+    ],
+  },
+  plugins: [new CleanWebpackPlugin(), new MiniCssExtractPlugin(), new HtmlWebpackPlugin({
+    template: './src/template.html',
+    minify: {
+      removeComments: true,
+      removeAttributeQuotes: true,
+      collapseWhitespace: true,
+    },
+  })],
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+    }],
+  },
+});</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-30 20:47:49 -0400
+Last updated 2020-07-30 21:39:24 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
