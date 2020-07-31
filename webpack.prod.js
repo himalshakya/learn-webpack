@@ -1,4 +1,5 @@
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const {
   merge
 } = require('webpack-merge');
@@ -13,5 +14,11 @@ module.exports = merge(common, {
     filename: '[name].[contentHash].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  plugins: [new CleanWebpackPlugin()],
+  plugins: [new CleanWebpackPlugin(), new MiniCssExtractPlugin()],
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+    }],
+  },
 });

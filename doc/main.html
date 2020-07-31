@@ -43,6 +43,7 @@
 <li><a href="#_using_dev_server">Using Dev-server</a></li>
 <li><a href="#_html_loader_file_loader_and_clean_webpack">HTML loader, File loader and Clean-Webpack</a></li>
 <li><a href="#_vendor_js_and_mutiple_entrypoint">Vendor.js and Mutiple Entrypoint</a></li>
+<li><a href="#_extract_css_and_minify_htmlcssjs">Extract CSS and Minify HTML/CSS/JS</a></li>
 </ul>
 </div>
 </div>
@@ -855,10 +856,26 @@ module.exports = merge(common, {
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_extract_css_and_minify_htmlcssjs">Extract CSS and Minify HTML/CSS/JS</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Currently CSS is being loaded by javascript, we want the CSS to load before javascript in production.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://webpack.js.org/plugins/mini-css-extract-plugin/" target="_blank" rel="noopener">MiniCssExtractPlugin</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">npm install --save-dev mini-css-extract-plugin</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-30 19:22:21 -0400
+Last updated 2020-07-30 20:47:49 -0400
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

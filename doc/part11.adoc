@@ -1,0 +1,74 @@
+== Extract CSS and Minify HTML/CSS/JS
+
+Currently CSS is being loaded by javascript, we want the CSS to load before javascript in production.
+
+https://webpack.js.org/plugins/mini-css-extract-plugin/[MiniCssExtractPlugin,window=_blank]
+
+[source, bash]
+----
+npm install --save-dev mini-css-extract-plugin
+----
+
+We then need to remove the rules for SCSS, we will add the rule that was present in common to development configuration
+
+*webconfig.common.js*
+[source, javascript]
+----
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  entry: {
+    main: './src/index.js',
+    vendor: './src/vendor.js',
+  },
+  module: {
+    rules: [{
+      test: /\.html$/i,
+      loader: 'html-loader',
+    }, {
+      test: /\.(svg|png|jpe?g|gif)$/i,
+      use: {
+        loader: 'file-loader',
+        options: {
+          name: '[name].[hash].[ext]',
+          outputPath: 'assets',
+        },
+      },
+    }],
+  },
+  plugins: [new HtmlWebpackPlugin({
+    template: './src/template.html',
+  })],
+};
+----
+
+We also need to modify the production configuration to add the rules to extract CSS
+
+*webconfig.prod.js*
+[source, javascript]
+----
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const {
+  merge
+} = require('webpack-merge');
+const {
+  CleanWebpackPlugin
+} = require('clean-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  output: {
+    filename: '[name].[contentHash].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin(), new MiniCssExtractPlugin()],
+  module: {
+    rules: [{
+      test: /\.scss$/i,
+      use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+    }],
+  },
+});
+----

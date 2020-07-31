@@ -88,3 +88,4 @@ module.exports = merge(common, {
 });
 ----
 <1> The _name_ is taken from the entry key
+
